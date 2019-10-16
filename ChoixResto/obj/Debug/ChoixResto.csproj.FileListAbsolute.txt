@@ -152,7 +152,6 @@ D:\Documents\Developpement\Microsoft Visual Studio\ChoixResto\ChoixResto\bin\fr\
 D:\Documents\Developpement\Microsoft Visual Studio\ChoixResto\ChoixResto\bin\fr\System.Web.Helpers.resources.dll
 D:\Documents\Developpement\Microsoft Visual Studio\ChoixResto\ChoixResto\bin\fr\System.Web.Mvc.resources.dll
 D:\Documents\Developpement\Microsoft Visual Studio\ChoixResto\ChoixResto\obj\Debug\ChoixResto.csprojAssemblyReference.cache
-D:\Documents\Developpement\Microsoft Visual Studio\ChoixResto\ChoixResto\obj\Debug\ChoixResto.csproj.CoreCompileInputs.cache
 D:\Documents\Developpement\Microsoft Visual Studio\ChoixResto\ChoixResto\obj\Debug\ChoixResto.csproj.CopyComplete
 D:\Documents\Developpement\Microsoft Visual Studio\ChoixResto\ChoixResto\obj\Debug\ChoixResto.dll
 D:\Documents\Developpement\Microsoft Visual Studio\ChoixResto\ChoixResto\obj\Debug\ChoixResto.pdb

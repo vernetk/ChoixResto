@@ -6,28 +6,19 @@ using System.Threading.Tasks;
 
 namespace ChoixResto.Models
 {
-    public interface IDal:IDisposable
+    public interface IDal : IDisposable
     {
-        //Restaurant
-        List<Resto> ObtientTousLesRestaurants();
-        void ModifierRestaurant(int id, string nom, string telephone);
-        bool RestaurantExiste(string nom);
         void CreerRestaurant(string nom, string telephone);
-
-
-        //Utilisateur
+        void ModifierRestaurant(int id, string nom, string telephone);
+        List<Resto> ObtientTousLesRestaurants();
+        bool RestaurantExiste(string nom);
+        int AjouterUtilisateur(string nom, string motDePasse);
+        Utilisateur Authentifier(string nom, string motDePasse);
         Utilisateur ObtenirUtilisateur(int id);
         Utilisateur ObtenirUtilisateur(string idStr);
-        int AjouterUtilisateur(string prenom, string motDePasse);
-        Utilisateur Authentifier(string prenom, string motDePasse);
-        bool ADejaVote(int idSondage, string idStr);
-
-
-        //Sondage
         int CreerUnSondage();
         void AjouterVote(int idSondage, int idResto, int idUtilisateur);
-
-        //Resultat
         List<Resultats> ObtenirLesResultats(int idSondage);
+        bool ADejaVote(int idSondage, string idStr);
     }
 }

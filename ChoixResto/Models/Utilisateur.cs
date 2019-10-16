@@ -9,8 +9,9 @@ namespace ChoixResto.Models
     public class Utilisateur
     {
         public int Id { get; set; }
-        [Required, MaxLength(80)]
+        [Required]
         public string Prenom { get; set; }
+        [Required]
         public string MotDePasse { get; set; }
     }
 }

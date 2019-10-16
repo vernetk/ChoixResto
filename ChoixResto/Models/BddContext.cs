@@ -6,7 +6,7 @@ using System.Web;
 
 namespace ChoixResto.Models
 {
-    public class BddContext:DbContext
+    public class BddContext : DbContext
     {
         public DbSet<Sondage> Sondages { get; set; }
         public DbSet<Resto> Restos { get; set; }

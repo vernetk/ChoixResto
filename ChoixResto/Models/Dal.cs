@@ -16,21 +16,17 @@ namespace ChoixResto.Models
             bdd = new BddContext();
         }
 
-        public void Dispose()
+        public List<Resto> ObtientTousLesRestaurants()
         {
-            bdd.Dispose();
+            return bdd.Restos.ToList();
         }
 
-        #region Restaurant
         public void CreerRestaurant(string nom, string telephone)
         {
             bdd.Restos.Add(new Resto { Nom = nom, Telephone = telephone });
             bdd.SaveChanges();
         }
-        public List<Resto> ObtientTousLesRestaurants()
-        {
-            return bdd.Restos.ToList();
-        }
+
         public void ModifierRestaurant(int id, string nom, string telephone)
         {
             Resto restoTrouve = bdd.Restos.FirstOrDefault(resto => resto.Id == id);
@@ -41,13 +37,27 @@ namespace ChoixResto.Models
                 bdd.SaveChanges();
             }
         }
+
         public bool RestaurantExiste(string nom)
         {
             return bdd.Restos.Any(resto => string.Compare(resto.Nom, nom, StringComparison.CurrentCultureIgnoreCase) == 0);
         }
-        #endregion
 
-        #region Utilisateurs
+        public int AjouterUtilisateur(string nom, string motDePasse)
+        {
+            string motDePasseEncode = EncodeMD5(motDePasse);
+            Utilisateur utilisateur = new Utilisateur { Prenom = nom, MotDePasse = motDePasseEncode };
+            bdd.Utilisateurs.Add(utilisateur);
+            bdd.SaveChanges();
+            return utilisateur.Id;
+        }
+
+        public Utilisateur Authentifier(string nom, string motDePasse)
+        {
+            string motDePasseEncode = EncodeMD5(motDePasse);
+            return bdd.Utilisateurs.FirstOrDefault(u => u.Prenom == nom && u.MotDePasse == motDePasseEncode);
+        }
+
         public Utilisateur ObtenirUtilisateur(int id)
         {
             return bdd.Utilisateurs.FirstOrDefault(u => u.Id == id);
@@ -57,42 +67,10 @@ namespace ChoixResto.Models
         {
             int id;
             if (int.TryParse(idStr, out id))
-            {
                 return ObtenirUtilisateur(id);
-            }
             return null;
         }
 
-        public int AjouterUtilisateur(string prenom, string motDePasse)
-        {
-            string motDePasseEncode = EncodeMD5(motDePasse);
-            Utilisateur utilisateur = new Utilisateur{ Prenom = prenom, MotDePasse = motDePasseEncode };
-            bdd.Utilisateurs.Add(utilisateur);
-            bdd.SaveChanges();
-            return utilisateur.Id;
-        }
-
-        public Utilisateur Authentifier(string prenom, string motDePasse)
-        {
-            string motDePasseEncode = EncodeMD5(motDePasse);
-            return bdd.Utilisateurs.FirstOrDefault(u => u.Prenom == prenom && u.MotDePasse == motDePasseEncode);
-        }
-
-        public bool ADejaVote(int idSondage, string idStr)
-        {
-            int id;
-            if (int.TryParse(idStr, out id))
-            {
-                Sondage sondage = bdd.Sondages.First(s => s.Id == idSondage);
-                if (sondage.Votes == null)
-                    return false;
-                return sondage.Votes.Any(v => v.Utilisateur != null && v.Utilisateur.Id == id);
-            }
-            return false;
-        }
-        #endregion
-
-        #region Sondage
         public int CreerUnSondage()
         {
             Sondage sondage = new Sondage { Date = DateTime.Now };
@@ -114,9 +92,7 @@ namespace ChoixResto.Models
             sondage.Votes.Add(vote);
             bdd.SaveChanges();
         }
-        #endregion
 
-        #region Resultat
         public List<Resultats> ObtenirLesResultats(int idSondage)
         {
             List<Resto> restaurants = ObtientTousLesRestaurants();
@@ -131,7 +107,24 @@ namespace ChoixResto.Models
             }
             return resultats;
         }
-        #endregion
+
+        public bool ADejaVote(int idSondage, string idStr)
+        {
+            int id;
+            if (int.TryParse(idStr, out id))
+            {
+                Sondage sondage = bdd.Sondages.First(s => s.Id == idSondage);
+                if (sondage.Votes == null)
+                    return false;
+                return sondage.Votes.Any(v => v.Utilisateur != null && v.Utilisateur.Id == id);
+            }
+            return false;
+        }
+
+        public void Dispose()
+        {
+            bdd.Dispose();
+        }
 
         private string EncodeMD5(string motDePasse)
         {
