@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -29,13 +30,31 @@ namespace ChoixResto.Models
 
         public void ModifierRestaurant(int id, string nom, string telephone)
         {
-            Resto restoTrouve = bdd.Restos.FirstOrDefault(resto => resto.Id == id);
-            if (restoTrouve != null)
+            try
             {
-                restoTrouve.Nom = nom;
-                restoTrouve.Telephone = telephone;
-                bdd.SaveChanges();
+                Resto restoTrouve = bdd.Restos.FirstOrDefault(resto => resto.Id == id);
+                if (restoTrouve != null)
+                {
+                    restoTrouve.Nom = nom;
+                    restoTrouve.Telephone = telephone;
+                    bdd.SaveChanges();
+                }
             }
+            catch (DbEntityValidationException e)
+            {
+                foreach (var eve in e.EntityValidationErrors)
+                {
+                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                    foreach (var ve in eve.ValidationErrors)
+                    {
+                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
+                            ve.PropertyName, ve.ErrorMessage);
+                    }
+                }
+            }
+
+
         }
 
         public bool RestaurantExiste(string nom)
@@ -63,14 +82,38 @@ namespace ChoixResto.Models
             return bdd.Utilisateurs.FirstOrDefault(u => u.Id == id);
         }
 
+        //public Utilisateur ObtenirUtilisateur(string idStr)
+        //{
+        //    int id;
+        //    if (int.TryParse(idStr, out id))
+        //        return ObtenirUtilisateur(id);
+        //    return null;
+        //}
         public Utilisateur ObtenirUtilisateur(string idStr)
         {
-            int id;
-            if (int.TryParse(idStr, out id))
-                return ObtenirUtilisateur(id);
-            return null;
+            switch (idStr)
+            {
+                case "Chrome":
+                    return CreeOuRecupere("Nico", "1234");
+                case "IE":
+                    return CreeOuRecupere("Jérémie", "1234");
+                case "Firefox":
+                    return CreeOuRecupere("Delphine", "1234");
+                default:
+                    return CreeOuRecupere("Timéo", "1234");
+            }
         }
 
+        private Utilisateur CreeOuRecupere(string nom, string motDePasse)
+        {
+            Utilisateur utilisateur = Authentifier(nom, motDePasse);
+            if (utilisateur == null)
+            {
+                int id = AjouterUtilisateur(nom, motDePasse);
+                return ObtenirUtilisateur(id);
+            }
+            return utilisateur;
+        }
         public int CreerUnSondage()
         {
             Sondage sondage = new Sondage { Date = DateTime.Now };
@@ -78,6 +121,8 @@ namespace ChoixResto.Models
             bdd.SaveChanges();
             return sondage.Id;
         }
+
+
 
         public void AjouterVote(int idSondage, int idResto, int idUtilisateur)
         {
@@ -108,19 +153,30 @@ namespace ChoixResto.Models
             return resultats;
         }
 
+        //public bool ADejaVote(int idSondage, string idStr)
+        //{
+        //    int id;
+        //    if (int.TryParse(idStr, out id))
+        //    {
+        //        Sondage sondage = bdd.Sondages.First(s => s.Id == idSondage);
+        //        if (sondage.Votes == null)
+        //            return false;
+        //        return sondage.Votes.Any(v => v.Utilisateur != null && v.Utilisateur.Id == id);
+        //    }
+        //    return false;
+        //}
         public bool ADejaVote(int idSondage, string idStr)
         {
-            int id;
-            if (int.TryParse(idStr, out id))
+            Utilisateur utilisateur = ObtenirUtilisateur(idStr);
+            if (utilisateur != null)
             {
                 Sondage sondage = bdd.Sondages.First(s => s.Id == idSondage);
                 if (sondage.Votes == null)
                     return false;
-                return sondage.Votes.Any(v => v.Utilisateur != null && v.Utilisateur.Id == id);
+                return sondage.Votes.Any(v => v.Utilisateur != null && v.Utilisateur.Id == utilisateur.Id);
             }
             return false;
         }
-
         public void Dispose()
         {
             bdd.Dispose();
